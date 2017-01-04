@@ -1,8 +1,6 @@
 
 import boto3
 
-# May have to modify the SNS message parts since it will be coming from RDS instead of CF
-
 rds = boto3.client('rds')
 logical_resource_ids = ('Snapshot-PostgresDB', 'Snapshot-OracleDB')
 # Initialize variables as empty strings
