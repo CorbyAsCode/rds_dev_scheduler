@@ -250,8 +250,8 @@
 					  "Key" : "Owner", 
 					  "Value" : { "Ref" : "TagOwner"  } 
 				  },
-				  {    "Key": "Template",
-				       "Value": "RDS_PostgreSQL_CloudFormation_Template"
+				  {   "Key": "Template",
+				      "Value": "RDS_PostgreSQL_CloudFormation_Template"
 				  }
 			  ]
   	      }
