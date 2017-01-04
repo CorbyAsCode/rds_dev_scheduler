@@ -24,7 +24,7 @@ def delete_rds_snapshots(event, context):
     # Check if the SNS notification we received is the one we need to use
     if event_source == 'db-snapshot' and \
        '-lifecycle-snapshot-' in current_db_snapshot_id and \
-       event_message == '':
+       event_message == 'Manual snapshot created':
            print "NOTICE:  This is the notification we're looking for...continuing."
     else:
         print "NOTICE:  This is not the notification we're looking for...exiting."
