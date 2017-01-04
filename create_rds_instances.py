@@ -3,6 +3,9 @@
 import boto3
 import json
 import os
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 # Initialize boto objects 
 s3_resource = boto3.resource('s3')
@@ -36,8 +39,8 @@ def create_rds_instances():
     # each new stack
     for instance in rds_instances_metadata.keys():
         db_instance_name = instance.lower()
-        db_instance_identifier = rds_instances_metadata[instance]['DBInstanceName'].lower()
-        snapshot_id_partial = db_instance_name + '-snapshot-'
+        db_instance_identifier = rds_instances_metadata[instance]['DBInstanceIdentifier'].lower()
+        snapshot_id_partial = db_instance_name + '-lifecycle-snapshot-'
         #cf_template_partial = rds_instances_metadata[instance]['Template']
 
         # Get all of this DB instance's snapshots
@@ -53,18 +56,24 @@ def create_rds_instances():
             if snapshot_id_partial in snapshot['DBSnapshotIdentifier']:
                 db_snapshot_identifier = snapshot['DBSnapshotIdentifier']
 
-        '''
-        # Loop through all of the objects in our S3 bucket to match the CF template
-        # with what we found for this stack in the S3 RDS parameters filestore.
-        for obj in s3_bucket.objects.filter(Prefix=dir_name):
-            if not obj.key.endswith('/'):
-                if cf_template_partial in obj.key:
-                    template_url = "%s/%s/%s" % (s3_client.meta.endpoint_url,
-                                                 s3_bucket.name,
-                                                 obj.key
-                                                )
-                    break
-        '''
+        restore_kwargs = {
+            'DBInstanceIdentifier': rds_instances_metadata[instance]['DBInstanceIdentifier'],
+            'DBSnapshotIdentifier': db_snapshot_identifier,
+            'DBInstanceClass': rds_instances_metadata[instance]['DBInstanceClass'],
+            'AvailabilityZone': rds_instances_metadata[instance]['AvailabilityZone'],
+            'DBSubnetGroupName': rds_instances_metadata[instance]['DBSubnetGroup']['DBSubnetGroupName'],
+            'MultiAZ': rds_instances_metadata[instance]['MultiAZ'],
+            'PubliclyAccessible': rds_instances_metadata[instance]['PubliclyAccessible'],
+            'AutoMinorVersionUpgrade': rds_instances_metadata[instance]['AutoMinorVersionUpgrade'],
+            'StorageType': rds_instances_metadata[instance]['StorageType'],
+            'Tags': [
+                        {
+                            "Key": "AWSService",
+                            "Value": rds_tag_value
+                        }
+                    ],
+            'CopyTagsToSnapshot': True
+        }
 
         # Create the new instance using the DB snapshot if it exists.
         # If snapshot doesn't exist create a new DB instance using the
@@ -72,17 +81,7 @@ def create_rds_instances():
 
         response = False
         try:
-            response = rds.restore_db_instance_from_snapshot(
-                           DBInstanceIdentifier=db_instance_name,
-                           DBSnapshotIdentifier=db_snapshot_identifier,
-                           NotificationARNs=[sns_arn],
-                           Tags=[
-                               {
-                                   "Key": "AWSService",
-                                   "Value": rds_tag_value
-                               }
-                           ]
-                       )
+            response = rds.restore_db_instance_from_db_snapshot(**restore_kwargs)
             print "NOTICE: Created DB Instance: %s from DB snapshot: %s" % (db_instance_name, db_snapshot_identifier)
 
         except Exception, err:
