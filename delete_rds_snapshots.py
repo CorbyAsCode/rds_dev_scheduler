@@ -10,11 +10,11 @@ event_source = current_db_snapshot_id = event_message = old_snapshot = db_instan
 def delete_rds_snapshots(event, context):
     # Get the message body
     message = json.loads(event['Records'][0]['Sns']['Message'])
-
+    
     event_source = message['Event Source']
     current_db_snapshot_id = message['Source ID']
     event_message = message['Event Message']
-
+    
     print "SNS MESSAGE: Event Source: %s; Source ID: %s; Event Message: %s" % (event_source, current_db_snapshot_id, event_message)
 
     # Check if the SNS notification we received is the one we need to use
@@ -24,7 +24,7 @@ def delete_rds_snapshots(event, context):
         print "NOTICE:  This is the notification we're looking for...continuing."
     else:
         print "NOTICE:  This is not the notification we're looking for...exiting."
-        return
+        return 
 
     # Need to query our current snapshot to get the DB instance identifier
     try:
@@ -32,21 +32,21 @@ def delete_rds_snapshots(event, context):
     except Exception, err:
         print "ERROR: Could not retrieve current snapshot metadata for %s: %s" % (current_db_snapshot_id, err)
         return
-
+    
     # Set the variable using the current snapshot metadata
     db_instance_identifier = current_snapshot_metadata['DBSnapshots'][0]['DBInstanceIdentifier']
-
+        
     # Query for all of the DB instance's snapshots
     try:
         snapshots = rds.describe_db_snapshots(DBInstanceIdentifier=db_instance_identifier)
     except Exception, err:
         print "ERROR: Could not retrieve snapshot metadata for %s: %s" % (db_instance_identifier, err)
         return
-
+    
     # If no other snapshots are found, we can stop here
     if len(snapshots['DBSnapshots']) == 0:
         return
-
+    
     # Loop through all snapshots to see which ones need deleted
     for snapshot in snapshots['DBSnapshots']:
         if snapshot['DBSnapshotIdentifier'] != current_db_snapshot_id:
