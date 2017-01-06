@@ -4,9 +4,6 @@ import boto3
 import json
 import os
 import datetime
-import pprint
-
-pp = pprint.PrettyPrinter(indent=4)
 
 # Initialize boto objects
 cf = boto3.client('cloudformation')
@@ -17,7 +14,7 @@ now = datetime.datetime.now()
 queried_rds_metadata = {}
 dir_name = os.environ['S3_DIR_NAME']
 rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
-rds_tag_value = os.environ['RDS_TAG_VALUE']
+app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
 bucket_name = os.environ['S3_BUCKET_NAME']
 
 #def delete_rds_stacks(event, context):
@@ -36,17 +33,12 @@ def delete_rds_stacks():
         if len(instance_tags['TagList']) > 0:
             for tag in instance_tags['TagList']:
                 if tag['Key'] == 'AWSService':
-                    if tag['Value'] != rds_tag_value:
+                    if tag['Value'] != app_lifecycle_tag:
                         pass
 
             queried_rds_metadata[instance['DBInstanceIdentifier']] = {}
             for key in instance.keys():
                 queried_rds_metadata[instance['DBInstanceIdentifier']][key] = json_serial(instance[key])
-            #queried_rds_metadata[instance['DBInstanceIdentifier']]['Parameters'] = instance
-
-            #for param in stack['Parameters']:
-            #    if param['ParameterKey'] == 'DBInstanceName':
-            #        queried_rds_metadata[stack['StackName']]['DBInstanceName'] = param['ParameterValue']
 
     update_s3 = False
     for instance in queried_rds_metadata.keys():
@@ -75,11 +67,7 @@ def delete_rds_stacks():
 
     # Update the S3 RDS metadata filestore if we deleted a stack
     if update_s3:
-        #print queried_rds_metadata
-
-        #pp.pprint(queried_rds_metadata)
         stringified_metadata = json.dumps(queried_rds_metadata, indent=4)
-
 
         try:
             response = s3_client.delete_object(Bucket=bucket_name, Key=rds_metadata_obj_name)
