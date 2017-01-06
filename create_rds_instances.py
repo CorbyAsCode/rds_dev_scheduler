@@ -38,10 +38,10 @@ def create_rds_instances():
     # then use the params for each stack to create 
     # each new stack
     for instance in rds_instances_metadata.keys():
+        db_snapshot_identifier = ''
         db_instance_name = instance.lower()
         db_instance_identifier = rds_instances_metadata[instance]['DBInstanceIdentifier'].lower()
         snapshot_id_partial = db_instance_name + '-lifecycle-snapshot-'
-        #cf_template_partial = rds_instances_metadata[instance]['Template']
 
         # Get all of this DB instance's snapshots
         try:
@@ -55,6 +55,10 @@ def create_rds_instances():
         for snapshot in snapshots['DBSnapshots']:
             if snapshot_id_partial in snapshot['DBSnapshotIdentifier']:
                 db_snapshot_identifier = snapshot['DBSnapshotIdentifier']
+
+        if not db_snapshot_identifier:
+            print "DB snapshot partial name not found in list of snapshots: %s" % snapshot_id_partial
+            continue
 
         restore_kwargs = {
             'DBInstanceIdentifier': rds_instances_metadata[instance]['DBInstanceIdentifier'],
