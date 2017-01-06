@@ -2,11 +2,11 @@
 import boto3
 import datetime
 import pytz
+import os
 
 rds = boto3.client('rds')
 
-# Initialize variables as empty strings
-event_source = current_db_snapshot_id = event_message = old_snapshot = db_instance_name = ''
+retention_time_weeks = os.environ['SNAPSHOT_RETENTION_WEEKS']
 
 def delete_rds_snapshots():
 
