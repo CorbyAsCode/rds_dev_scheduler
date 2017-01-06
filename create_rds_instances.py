@@ -3,21 +3,16 @@
 import boto3
 import json
 import os
-import pprint
-
-pp = pprint.PrettyPrinter(indent=4)
 
 # Initialize boto objects 
 s3_resource = boto3.resource('s3')
 s3_client = boto3.client('s3')
-cf = boto3.client('cloudformation')
 rds = boto3.client('rds')
 # Initialize variables
 bucket_name = os.environ['S3_BUCKET_NAME']
 dir_name = os.environ['S3_DIR_NAME']
 rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
-sns_arn = os.environ['SNS_ARN']
-rds_tag_value = os.environ['RDS_TAG_VALUE']
+app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
 s3_bucket = s3_resource.Bucket(bucket_name)
 
 #def create_rds_stacks(event, context):
@@ -72,8 +67,8 @@ def create_rds_instances():
             'StorageType': rds_instances_metadata[instance]['StorageType'],
             'Tags': [
                         {
-                            "Key": "AWSService",
-                            "Value": rds_tag_value
+                            "Key": "AppLifecycle",
+                            "Value": app_lifecycle_tag
                         }
                     ],
             'CopyTagsToSnapshot': True
@@ -86,8 +81,8 @@ def create_rds_instances():
         response = False
         try:
             response = rds.restore_db_instance_from_db_snapshot(**restore_kwargs)
-            print "NOTICE: Created DB Instance: %s from DB snapshot: %s" % (db_instance_name, db_snapshot_identifier)
-
+            print "NOTICE: Created DB Instance: %s from DB snapshot: %s Elapsed time: %s" % (db_instance_name, db_snapshot_identifier,
+                                                                                             end - start)
         except Exception, err:
             print "ERROR: Error creating DB Instance %s: %s" % (db_instance_name, err)
 
