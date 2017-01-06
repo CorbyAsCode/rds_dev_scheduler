@@ -10,8 +10,7 @@ retention_time_weeks = os.environ['SNAPSHOT_RETENTION_WEEKS']
 
 def delete_rds_snapshots():
 
-    now = datetime.datetime.now()
-    now = now.replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now().replace(tzinfo=pytz.utc)
     one_week = datetime.timedelta(weeks=7)
     date_7_days_ago = now - one_week
 
