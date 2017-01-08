@@ -5,6 +5,9 @@ week_we_want_to_run_in = 4
 test_date = date(2017, 1, 27)
 
 def check_week_number_of_month(date_to_check, week_number):
+    if week_number > 6 or week_number == 'all':
+        return True
+
     number_of_full_weeks = 0
     weeks_list = []
     cal = calendar.Calendar()
@@ -17,6 +20,9 @@ def check_week_number_of_month(date_to_check, week_number):
             weeks_list.append(week)
 
     if date_to_check.day in weeks_list[week_number - 1]:
-        print "%s is in week #%s of %s" % (date_to_check.day, week_number, date_to_check.strftime('%B'))
+        return True
+    else:
+        return False
 
-check_week_number_of_month(test_date, week_we_want_to_run_in)
+answer = check_week_number_of_month(test_date, week_we_want_to_run_in)
+print answer
