@@ -42,4 +42,4 @@ def delete_rds_snapshots(event, context):
                     print "ERROR: Could not delete DB snapshot %s: %s" % (snap_id, err)
 
 
-                    # delete_rds_snapshots()
+#delete_rds_snapshots()
