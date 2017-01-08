@@ -1,4 +1,3 @@
-
 import boto3
 import datetime
 import pytz
@@ -6,17 +5,17 @@ import os
 
 rds = boto3.client('rds')
 
-retention_time_weeks = os.environ['SNAPSHOT_RETENTION_WEEKS']
+retention_time_days = int(os.environ['SNAPSHOT_RETENTION_DAYS'])
 
-def delete_rds_snapshots():
 
+def delete_rds_snapshots(event, context):
     now = datetime.datetime.now().replace(tzinfo=pytz.utc)
-    one_week = datetime.timedelta(weeks=7)
-    date_7_days_ago = now - one_week
+    subtract_days = datetime.timedelta(days=retention_time_days)
+    # snapshot_cutoff_date = now - subtract_days
 
     # For testing...
-    one_hour = datetime.timedelta(hours=3)
-    last_hour = now - one_hour
+    one_hour = datetime.timedelta(hours=1)
+    snapshot_cutoff_date = now - one_hour
 
     # Query for all of the DB snapshots
     try:
@@ -24,20 +23,18 @@ def delete_rds_snapshots():
     except Exception, err:
         print "ERROR: Could not retrieve snapshot metadata: %s" % err
         return
-    
+
     # If no other snapshots are found, we can stop here
     if len(all_snapshots) == 0:
         return
-    
+
     # Loop through all snapshots to see which ones need deleted
     for snapshot in all_snapshots:
         snap_timestamp = snapshot['SnapshotCreateTime']
-        print snap_timestamp
         snap_id = snapshot['DBSnapshotIdentifier']
 
         if '-lifecycle-snapshot-' in snap_id:
-            #if snap_timestamp < date_7_days_ago:
-            if snap_timestamp < last_hour:
+            if snap_timestamp < snapshot_cutoff_date:
                 try:
                     response = rds.delete_db_snapshot(DBSnapshotIdentifier=snap_id)
                     print "Deleted snapshot '%s'" % snap_id
@@ -45,4 +42,4 @@ def delete_rds_snapshots():
                     print "ERROR: Could not delete DB snapshot %s: %s" % (snap_id, err)
 
 
-delete_rds_snapshots()
+                    # delete_rds_snapshots()

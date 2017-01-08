@@ -15,8 +15,8 @@ rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
 app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
 s3_bucket = s3_resource.Bucket(bucket_name)
 
-#def create_rds_stacks(event, context):
-def create_rds_instances():
+def create_rds_instances(event, context):
+#def create_rds_instances():
 
     # Get the previous RDS instance parameters from S3 as recorded by the delete process
     try:
@@ -28,10 +28,7 @@ def create_rds_instances():
         rds_instances_metadata = json.loads(j)
     except Exception, err:
         print "ERROR: Error converting S3 text file to dictionary: %s" % err
-        
-    # Find the CF templates used for each CF Stack,
-    # then use the params for each stack to create 
-    # each new stack
+
     for instance in rds_instances_metadata.keys():
         db_snapshot_identifier = ''
         db_instance_name = instance.lower()
@@ -46,7 +43,7 @@ def create_rds_instances():
 
         # Loop through all of this DB instance's snapshots to find one that was
         # created by RDS.
-        # The delete process should keep the most recent CF-created snapshot.
+        # The delete process should keep the most recent RDS-created snapshot.
         for snapshot in snapshots['DBSnapshots']:
             if snapshot_id_partial in snapshot['DBSnapshotIdentifier']:
                 db_snapshot_identifier = snapshot['DBSnapshotIdentifier']
@@ -75,15 +72,11 @@ def create_rds_instances():
         }
 
         # Create the new instance using the DB snapshot if it exists.
-        # If snapshot doesn't exist create a new DB instance using the
-        # parameters for that instance.
-
         response = False
         try:
             response = rds.restore_db_instance_from_db_snapshot(**restore_kwargs)
-            print "NOTICE: Created DB Instance: %s from DB snapshot: %s Elapsed time: %s" % (db_instance_name, db_snapshot_identifier,
-                                                                                             end - start)
+            print "NOTICE: Created DB Instance: %s from DB snapshot: %s" % (db_instance_name, db_snapshot_identifier)
         except Exception, err:
             print "ERROR: Error creating DB Instance %s: %s" % (db_instance_name, err)
 
-create_rds_instances()
+#create_rds_instances()
