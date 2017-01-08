@@ -3,6 +3,8 @@
 import boto3
 import json
 import os
+import datetime
+import calendar
 
 # Initialize boto objects 
 s3_resource = boto3.resource('s3')
@@ -13,10 +15,15 @@ bucket_name = os.environ['S3_BUCKET_NAME']
 dir_name = os.environ['S3_DIR_NAME']
 rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
 app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
+week_to_execute = os.environ['WEEK_TO_EXECUTE']
 s3_bucket = s3_resource.Bucket(bucket_name)
+now = datetime.datetime.now()
 
 def create_rds_instances(event, context):
 #def create_rds_instances():
+
+    if not check_week_number_of_month(now, week_to_execute):
+        return
 
     # Get the previous RDS instance parameters from S3 as recorded by the delete process
     try:
@@ -78,5 +85,25 @@ def create_rds_instances(event, context):
             print "NOTICE: Created DB Instance: %s from DB snapshot: %s" % (db_instance_name, db_snapshot_identifier)
         except Exception, err:
             print "ERROR: Error creating DB Instance %s: %s" % (db_instance_name, err)
+
+def check_week_number_of_month(date_to_check, week_number):
+    if week_number > 6 or week_number == 'all':
+        return True
+
+    number_of_full_weeks = 0
+    weeks_list = []
+    cal = calendar.Calendar()
+    weeks_of_month = cal.monthdayscalendar(date_to_check.year, date_to_check.month)
+    for week in weeks_of_month:
+        if 0 in week:
+            continue
+        else:
+            number_of_full_weeks += 1
+            weeks_list.append(week)
+
+    if date_to_check.day in weeks_list[week_number - 1]:
+        return True
+    else:
+        return False
 
 #create_rds_instances()
