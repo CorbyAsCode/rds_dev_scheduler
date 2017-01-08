@@ -7,3 +7,4 @@ export APP_LIFECYCLE_TAG="remedy-lifecycle"
 export AWS_DEFAULT_REGION="us-east-1"
 export RDS_METADATA_FILENAME="${APP_LIFECYCLE_TAG}-db-metadata.json"
 export SNAPSHOT_RETENTION_WEEKS="1"
+export WEEK_TO_EXECUTE=3
