@@ -15,7 +15,7 @@ the databases, thereby, saving you lots of $$$.
 
 
 ## Behind the Scenes
-* Each Lambda function is configurable via environment variables.
+Each Lambda function is configurable via environment variables.
 
 ### create_rds_instances.py
 Creates RDS instances using metadata stored in S3 by the delete_rds_instances.py script.
