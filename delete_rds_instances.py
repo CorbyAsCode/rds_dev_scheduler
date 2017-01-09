@@ -17,8 +17,8 @@ rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
 app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
 bucket_name = os.environ['S3_BUCKET_NAME']
 
-#def delete_rds_stacks(event, context):
-def delete_rds_stacks():
+def delete_rds_instances(event, context):
+#def delete_rds_instances():
 
     try:
         all_db_instances = rds.describe_db_instances()
@@ -32,7 +32,7 @@ def delete_rds_stacks():
 
         if len(instance_tags['TagList']) > 0:
             for tag in instance_tags['TagList']:
-                if tag['Key'] == 'AWSService':
+                if tag['Key'] == 'AppLifecycle':
                     if tag['Value'] != app_lifecycle_tag:
                         pass
 
@@ -43,12 +43,12 @@ def delete_rds_stacks():
     update_s3 = False
     for instance in queried_rds_metadata.keys():
         final_snapshot_id = instance + '-lifecycle-snapshot-' + '%s%02d%02d-%02d%02d%02d' % (now.year,
-                                                                                                 now.month,
-                                                                                                 now.day,
-                                                                                                 now.hour,
-                                                                                                 now.minute,
-                                                                                                 now.second
-                                                                                                )
+                                                                                             now.month,
+                                                                                             now.day,
+                                                                                             now.hour,
+                                                                                             now.minute,
+                                                                                             now.second
+                                                                                             )
 
         try:
             response = rds.delete_db_instance(
@@ -89,4 +89,4 @@ def json_serial(obj):
         return obj
     raise TypeError ("Type not serializable")
 
-delete_rds_stacks()
+#delete_rds_instances()

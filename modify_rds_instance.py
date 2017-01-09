@@ -10,6 +10,7 @@ bucket_name = os.environ['S3_BUCKET_NAME']
 dir_name = os.environ['S3_DIR_NAME']
 rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
 
+
 def modify_instance(event, context):
     message = event['Records'][0]['Sns']['Message']
 
@@ -21,8 +22,8 @@ def modify_instance(event, context):
         if 'Source ID' in pair:
             db_instance_id = str(pair.split(':')[1].strip('{').strip('}').strip('"'))
 
-    if not 'Restored from snapshot' in event_message and \
-        not '-lifecycle-snapshot-' in event_message:
+    if 'Restored from snapshot' not in event_message and \
+       '-lifecycle-snapshot-' not in event_message:
         print "NOTICE: This is not the message we're looking for...exiting"
         return
     else:
