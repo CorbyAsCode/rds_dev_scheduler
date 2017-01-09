@@ -3,6 +3,5 @@
 export S3_BUCKET_NAME="4652-5751-2377-rds-export"
 export S3_DIR_NAME="SDBA"
 export RDS_METADATA_FILENAME="rds-metadata.json"
-#export SNS_ARN="arn:aws:sns:us-east-1:332481357897:cf-rds-event"
 export RDS_TAG_VALUE="RDS"
 export AWS_DEFAULT_REGION="us-east-1"
