@@ -87,7 +87,7 @@ def create_rds_instances(event, context):
             print "ERROR: Error creating DB Instance %s: %s" % (db_instance_name, err)
 
 def check_week_number_of_month(date_to_check, week_number):
-    if week_number > 6 or week_number == 'all':
+    if week_number == 'all':
         return True
 
     number_of_full_weeks = 0
