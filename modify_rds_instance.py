@@ -49,6 +49,7 @@ def modify_instance(event, context):
             DBInstanceIdentifier=db_instance_id,
             VpcSecurityGroupIds=db_security_groups
         )
+        print "NOTICE: Modified DB instance '%s'" % db_instance_id
     except Exception, err:
         print "ERROR: Could not modify DB instance '%s': %s" % (db_instance_id, err)
 

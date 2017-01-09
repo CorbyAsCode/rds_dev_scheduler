@@ -40,7 +40,7 @@ def delete_rds_snapshots():
             if snap_timestamp < last_hour:
                 try:
                     response = rds.delete_db_snapshot(DBSnapshotIdentifier=snap_id)
-                    print "Deleted snapshot '%s'" % snap_id
+                    print "NOTICE: Deleted snapshot '%s'" % snap_id
                 except Exception, err:
                     print "ERROR: Could not delete DB snapshot %s: %s" % (snap_id, err)
 
