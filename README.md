@@ -28,51 +28,51 @@ Creates RDS instances using metadata stored in S3 by the delete_rds_instances.py
   - last: execute on the last full week of the month
   - [0-6]: execute on a specific full week of the month
   
-- APP_LIFECYCLE_TAG - values (any text)
+- APP_LIFECYCLE_TAG - values (string)
   - Used to mark instances to be managed by this process
   
-- S3_BUCKET_NAME - values (any text)
+- S3_BUCKET_NAME - values (string)
   - The name of the S3 bucket where you're going to store the DB metadata
   
-- S3_DIR_NAME - values (any text)
+- S3_DIR_NAME - values (string)
   - The name of the S3 directory where you're going to store the DB metadata
   
-- RDS_METADATA_FILENAME - values (any text)
+- RDS_METADATA_FILENAME - values (string)
   - The name of the S3 object store where your DB metadata will be saved prior to deletion
   
 ### delete_rds_instances.py
 Deletes RDS instances that are tagged with "AppLifecycle: $APP_LIFECYCLE_TAG".  Creates a final snapshot and saves the DB instances' metadata in S3.
 
 #### Variables
-- APP_LIFECYCLE_TAG - values (any text)
+- APP_LIFECYCLE_TAG - values (string)
   - The tag to search for in RDS
   
-- S3_BUCKET_NAME - values (any text)
+- S3_BUCKET_NAME - values (string)
   - The name of the S3 bucket where you're going to store the DB metadata
   
-- S3_DIR_NAME - values (any text)
+- S3_DIR_NAME - values (string)
   - The name of the S3 directory where you're going to store the DB metadata
   
-- RDS_METADATA_FILENAME - values (any text)
+- RDS_METADATA_FILENAME - values (string)
   - The name of the S3 object store where your DB metadata will be saved prior to deletion
   
 ### delete_rds_snapshots.py
 Deletes snapshots that are older than $SNAPSHOT_RETENTION_DAYS and contain '-lifecycle-snapshot-' in their name.
 
 #### Variables
-- SNAPSHOT_RETENTION_DAYS - values (all integers)
+- SNAPSHOT_RETENTION_DAYS - values (integer)
   - Age of snapshots in days to retain
   
 ### modify_rds_instance.py
 Modifies an RDS instance after it is created to add it to the correct Subnet Groups.
 
 #### Variables
-- S3_BUCKET_NAME - values (any text)
+- S3_BUCKET_NAME - values (string)
   - The name of the S3 bucket where you're going to store the DB metadata
   
-- S3_DIR_NAME - values (any text)
+- S3_DIR_NAME - values (string)
   - The name of the S3 directory where you're going to store the DB metadata
   
-- RDS_METADATA_FILENAME - values (any text)
+- RDS_METADATA_FILENAME - values (string)
   - The name of the S3 object store where your DB metadata will be saved prior to deletion
   
