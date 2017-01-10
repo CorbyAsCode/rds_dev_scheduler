@@ -19,8 +19,8 @@ week_to_execute = os.environ['WEEK_TO_EXECUTE']
 s3_bucket = s3_resource.Bucket(bucket_name)
 now = datetime.datetime.now()
 
-#def create_rds_instances(event, context):
-def create_rds_instances():
+def create_rds_instances(event, context):
+
 
     if not check_week_number_of_month(now, week_to_execute):
         return
@@ -30,7 +30,7 @@ def create_rds_instances():
         j = s3_client.get_object(Bucket=bucket_name, Key=rds_metadata_obj_name)['Body'].read()
     except Exception, err:
         print "ERROR: Error retreiving RDS instance metadata: %s" % err
-        
+
     try:
         rds_instances_metadata = json.loads(j)
     except Exception, err:
@@ -115,4 +115,3 @@ def check_week_number_of_month(date_to_check, week_number):
     else:
         return False
 
-create_rds_instances()
