@@ -3,26 +3,26 @@ import json
 import os
 import datetime
 
-# Initialize boto objects
-cf = boto3.client('cloudformation')
-rds = boto3.client('rds')
-s3_resource = boto3.resource('s3')
-s3_client = boto3.client('s3')
-now = datetime.datetime.now()
-queried_rds_metadata = {}
-dir_name = os.environ['S3_DIR_NAME']
-rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
-app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
-bucket_name = os.environ['S3_BUCKET_NAME']
-
 
 def delete_rds_instances(event, context):
+    # Initialize boto objects
+    rds = boto3.client('rds')
+    s3_resource = boto3.resource('s3')
+    s3_client = boto3.client('s3')
+    # Initialize env vars
+    dir_name = os.environ['S3_DIR_NAME']
+    rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
+    app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
+    bucket_name = os.environ['S3_BUCKET_NAME']
+
+    now = datetime.datetime.now()
+    queried_rds_metadata = {}
 
     try:
         all_db_instances = rds.describe_db_instances()
     except Exception, err:
         print "ERROR: Could not retreive all DB instances metadata: %s" % err
-        
+
     for instance in all_db_instances['DBInstances']:
         arn = instance['DBInstanceArn']
 
@@ -47,7 +47,7 @@ def delete_rds_instances(event, context):
                                                                                              now.minute,
                                                                                              now.second
                                                                                              )
-
+        print final_snapshot_id
         try:
             response = rds.delete_db_instance(
                            DBInstanceIdentifier=instance,
