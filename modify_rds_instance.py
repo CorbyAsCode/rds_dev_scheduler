@@ -2,16 +2,16 @@ import boto3
 import os
 import json
 
-rds = boto3.client('rds')
-s3_client = boto3.client('s3')
-
-# Initialize variables
-bucket_name = os.environ['S3_BUCKET_NAME']
-dir_name = os.environ['S3_DIR_NAME']
-rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
-
 
 def modify_instance(event, context):
+    rds = boto3.client('rds')
+    s3_client = boto3.client('s3')
+
+    # Initialize variables
+    bucket_name = os.environ['S3_BUCKET_NAME']
+    dir_name = os.environ['S3_DIR_NAME']
+    rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
+
     message = event['Records'][0]['Sns']['Message']
 
     for pair in message.split(','):
