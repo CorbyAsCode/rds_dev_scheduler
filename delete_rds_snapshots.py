@@ -31,17 +31,16 @@ def delete_rds_snapshots(event, context):
     
     # Loop through all snapshots to see which ones need deleted
     for snapshot in all_snapshots:
-        snap_timestamp = snapshot['SnapshotCreateTime']
-        snap_id = snapshot['DBSnapshotIdentifier']
-        snap_status = snapshot['Status']
+        if snapshot['Status'] == 'available':
+            snap_timestamp = snapshot['SnapshotCreateTime']
+            snap_id = snapshot['DBSnapshotIdentifier']
 
-        if '-lifecycle-snapshot-' in snap_id and \
-            snap_status == 'Available':
-            if snap_timestamp < snapshot_cutoff_date:
-                try:
-                    response = rds.delete_db_snapshot(DBSnapshotIdentifier=snap_id)
-                    print "NOTICE: Deleted snapshot '%s'" % snap_id
-                except Exception, err:
-                    print "ERROR: Could not delete DB snapshot %s: %s" % (snap_id, err)
+            if '-lifecycle-snapshot-' in snap_id:
+                if snap_timestamp < snapshot_cutoff_date:
+                    try:
+                        response = rds.delete_db_snapshot(DBSnapshotIdentifier=snap_id)
+                        print "NOTICE: Deleted snapshot '%s'" % snap_id
+                    except Exception, err:
+                        print "ERROR: Could not delete DB snapshot %s: %s" % (snap_id, err)
 
 
