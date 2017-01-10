@@ -1,5 +1,3 @@
-
-
 import boto3
 import json
 import os
@@ -17,8 +15,8 @@ rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
 app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
 bucket_name = os.environ['S3_BUCKET_NAME']
 
+
 def delete_rds_instances(event, context):
-#def delete_rds_instances():
 
     try:
         all_db_instances = rds.describe_db_instances()
@@ -88,5 +86,4 @@ def json_serial(obj):
     else:
         return obj
     raise TypeError ("Type not serializable")
-
-#delete_rds_instances()
+    
