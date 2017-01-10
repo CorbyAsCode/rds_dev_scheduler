@@ -6,21 +6,21 @@ import os
 import datetime
 import calendar
 
-# Initialize boto objects 
-s3_resource = boto3.resource('s3')
-s3_client = boto3.client('s3')
-rds = boto3.client('rds')
-# Initialize variables
-bucket_name = os.environ['S3_BUCKET_NAME']
-dir_name = os.environ['S3_DIR_NAME']
-rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
-app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
-week_to_execute = os.environ['WEEK_TO_EXECUTE']
-s3_bucket = s3_resource.Bucket(bucket_name)
-now = datetime.datetime.now()
 
 def create_rds_instances(event, context):
+    # Initialize boto objects
+    s3_resource = boto3.resource('s3')
+    s3_client = boto3.client('s3')
+    rds = boto3.client('rds')
+    # Initialize env variables
+    bucket_name = os.environ['S3_BUCKET_NAME']
+    dir_name = os.environ['S3_DIR_NAME']
+    rds_metadata_obj_name = dir_name + '/' + os.environ['RDS_METADATA_FILENAME']
+    app_lifecycle_tag = os.environ['APP_LIFECYCLE_TAG']
+    week_to_execute = os.environ['WEEK_TO_EXECUTE']
 
+    s3_bucket = s3_resource.Bucket(bucket_name)
+    now = datetime.datetime.now()
 
     if not check_week_number_of_month(now, week_to_execute):
         return
