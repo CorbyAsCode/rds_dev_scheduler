@@ -4,12 +4,10 @@ import datetime
 import pytz
 import os
 
-rds = boto3.client('rds')
-
-retention_time_days = int(os.environ['SNAPSHOT_RETENTION_DAYS'])
 
 def delete_rds_snapshots(event, context):
-
+    rds = boto3.client('rds')
+    retention_time_days = int(os.environ['SNAPSHOT_RETENTION_DAYS'])
     now = datetime.datetime.now().replace(tzinfo=pytz.utc)
     subtract_days = datetime.timedelta(days=retention_time_days)
     #snapshot_cutoff_date = now - subtract_days
